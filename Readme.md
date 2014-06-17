@@ -64,6 +64,11 @@ console.log('%s@v%s', myPackage.name, myPackage.version) // => my-package@v2
 * Original function will be passed as the third argument to the after function.
 * Original function `this` context is maintained.
 
+## See Also
+
+* [timoxley/beforefn](http://github.com/timoxley/beforefn)
+* [timoxley/guardfn](http://github.com/timoxley/guardfn)
+
 ## License
 
 MIT
