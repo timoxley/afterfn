@@ -19,9 +19,9 @@ var doubleNumberAbs = after.return(doubleNumber, Math.abs)
 var calledWith = []
 var results = []
 
-doubleNumberAbs = after(doubleNumberAbs, function(result, args) {
-  calledWith = calledWith.concat(args)
-  results = results.concat(result)
+doubleNumberAbs = after(doubleNumberAbs, function fn() {
+  calledWith = calledWith.concat(fn.args)
+  results = results.concat(fn.value)
   // after ignores return value of after function.
 })
 
@@ -31,7 +31,6 @@ console.log(doubleNumberAbs(-100)) // => 200
 
 console.log(calledWith) // => [ 10, -10, -100 ]
 console.log(results) // => [ 20, 20, 200 ]
-
 ```
 
 ```js
@@ -51,7 +50,7 @@ myPackage.build = after(myPackage.build, myPackage.bumpVersion)
 
 console.log('%s@v%s', myPackage.name, myPackage.version) // => my-package@v1
 myPackage.build()
-console.log('%s@v%s', myPackage.name, myPackage.version) // => => my-package@v2
+console.log('%s@v%s', myPackage.name, myPackage.version) // => my-package@v2
 
 ```
 

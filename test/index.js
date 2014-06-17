@@ -26,26 +26,84 @@ test('after maintains context', function(t) {
   }).apply(context)
 })
 
-test('after is passed args', function(t) {
+test('after is passed args as regular args', function(t) {
   t.plan(1)
   after(function(a, b, c) {
     return
-  }, function(result, args) {
-    t.deepEqual(args, [1,2,3])
+  }, function() {
+    t.deepEqual([].slice.call(arguments), [1,2,3])
   })(1,2,3)
 })
 
-test('after cannot change return value', function(t) {
+test('after is passed args on fn', function(t) {
+  t.plan(1)
+  after(function(a, b, c) {
+    return
+  }, function fn() {
+    t.deepEqual(fn.args, [1,2,3])
+  })(1,2,3)
+})
+
+test('after.return is passed args on fn', function(t) {
+  t.plan(1)
+  after.return(function(a, b, c) {
+    return
+  }, function fn() {
+    t.deepEqual(fn.args, [1,2,3])
+  })(1,2,3)
+})
+
+
+test('after is passed original fn on fn', function(t) {
+  t.plan(1)
+  var noop = function(a, b, c) {
+    return
+  }
+  after(noop, function fn() {
+    t.equal(fn.fn, noop)
+  })()
+})
+
+test('after is passed return value on fn', function(t) {
+  t.plan(1)
+  after(function(a, b, c) {
+    return 10
+  }, function fn() {
+    t.equal(fn.value, 10)
+  })()
+})
+
+test('after.return is passed return value on fn', function(t) {
+  t.plan(1)
+  after.return(function(a, b, c) {
+    return 10
+  }, function fn() {
+    t.equal(fn.value, 10)
+  })()
+})
+
+test('after cannot change return value with return', function(t) {
   var fn = after(function(a, b, c) {
     return a + b + c
-  }, function(result) {
-    return result * 2
+  }, function() {
+    return 200
   })
   t.equal(fn(1,2,3), 6)
   t.end()
 })
 
-test('after.return can change return value', function(t) {
+test('after can change return value by changing fn.value', function(t) {
+  var fn = after(function(a, b, c) {
+    return a + b + c
+  }, function fn(a, b, c) {
+    fn.value = fn.value * 1000
+    return 200
+  })
+  t.equal(fn(1,2,3), 6000)
+  t.end()
+})
+
+test('after.return can change return value with return', function(t) {
   var fn = after.return(function(a, b, c) {
     return a + b + c
   }, function(result) {
@@ -55,7 +113,18 @@ test('after.return can change return value', function(t) {
   t.end()
 })
 
-test('after is passed original function', function(t) {
+test('after.return cannot change return value with fn.value', function(t) {
+  var fn = after.return(function(a, b, c) {
+    return a + b + c
+  }, function fn(result) {
+    fn.value = 1000
+    return result * 2
+  })
+  t.equal(fn(1,2,3), 12)
+  t.end()
+})
+
+test('after.return is passed original function', function(t) {
   var fn = after.return(function(a, b) {
     return a + b
   }, function(result, args, fn) {
@@ -66,8 +135,18 @@ test('after is passed original function', function(t) {
   t.equal(fn(1,2), 9)
   t.end()
 })
+test('after.return is passed original function on fn', function(t) {
+  var noop = function(a, b) {
+    return
+  }
+  var fn = after.return(noop, function fn() {
+    return fn.fn
+  })
+  t.equal(fn(), noop)
+  t.end()
+})
 
-test('returns value', function(t) {
+test('after.return overrides return value', function(t) {
   var result = after.return(function(a, b) {
     return a + b
   }, function() {
@@ -80,19 +159,21 @@ test('returns value', function(t) {
 test('chain executes in order of definition', function(t) {
   t.plan(3)
   var called = []
-  var result = after.return(function(a, b) {
+
+  function add(a, b) {
     return a + b
-  }, function(result) {
+  }
+
+  var fn = after(add, function() {
     t.deepEqual(called, [])
     called.push('first')
-    return result
   })
 
-  result = after.return(result, function(result) {
+  fn = after.return(fn, function(result) {
     t.deepEqual(called, ['first'])
     called.push('second')
     return result
   })
 
-  t.equal(result(2,3), 5)
+  t.equal(fn(2,3), 5)
 })

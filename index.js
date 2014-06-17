@@ -1,14 +1,19 @@
 "use strict"
+
 var slice = require('sliced')
 module.exports = afterQueue
 
 function afterQueue(fn, doAfter) {
   function after() {
     var result = fn.apply(this, arguments)
-    function f() {
-      return fn.apply(this, arguments)
-    }
-    doAfter.call(this, result, slice(arguments), fn)
+    doAfter.value = result
+    doAfter.fn = fn
+    doAfter.args = slice(arguments)
+    doAfter.apply(this, doAfter.args)
+    result = doAfter.value
+    delete doAfter.value
+    delete doAfter.args
+    delete doAfter.fn
     return result
   }
   return after
@@ -17,10 +22,14 @@ function afterQueue(fn, doAfter) {
 afterQueue.return = function afterQueueValue(fn, doAfter) {
   function after() {
     var result = fn.apply(this, arguments)
-    function f() {
-      return fn.apply(this, arguments)
-    }
-    return doAfter.call(this, result, slice(arguments), fn)
+    doAfter.value = result
+    doAfter.fn = fn
+    doAfter.args = slice(arguments)
+    result = doAfter.call(this, doAfter.value, doAfter.args, doAfter.fn)
+    delete doAfter.value
+    delete doAfter.args
+    delete doAfter.fn
+    return result
   }
   return after
 }

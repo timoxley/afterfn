@@ -11,9 +11,9 @@ var doubleNumberAbs = after.return(doubleNumber, Math.abs)
 var calledWith = []
 var results = []
 
-doubleNumberAbs = after(doubleNumberAbs, function(result, args) {
-  calledWith = calledWith.concat(args)
-  results = results.concat(result)
+doubleNumberAbs = after(doubleNumberAbs, function fn() {
+  calledWith = calledWith.concat(fn.args)
+  results = results.concat(fn.value)
   // after ignores return value of after function.
 })
 

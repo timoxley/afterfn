@@ -16,5 +16,5 @@ myPackage.build = after(myPackage.build, myPackage.bumpVersion)
 
 console.log('%s@v%s', myPackage.name, myPackage.version) // => my-package@v1
 myPackage.build()
-console.log('%s@v%s', myPackage.name, myPackage.version) // => => my-package@v2
+console.log('%s@v%s', myPackage.name, myPackage.version) // => my-package@v2
 
