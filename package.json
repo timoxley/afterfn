@@ -1,0 +1,35 @@
+{
+  "name": "afterfn",
+  "version": "1.0.0",
+  "description": "Invoke a function after a function.",
+  "main": "index.js",
+  "scripts": {
+    "test": "tape test"
+  },
+  "author": "Tim Oxley",
+  "license": "MIT",
+  "devDependencies": {
+    "tape": "^2.13.3"
+  },
+  "keywords": [
+    "aspect",
+    "aop",
+    "functional",
+    "oriented"
+  ],
+  "directories": {
+    "example": "examples",
+    "test": "test"
+  },
+  "dependencies": {
+    "sliced": "0.0.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/timoxley/afterfn.git"
+  },
+  "bugs": {
+    "url": "https://github.com/timoxley/afterfn/issues"
+  },
+  "homepage": "https://github.com/timoxley/afterfn"
+}
