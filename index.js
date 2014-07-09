@@ -4,6 +4,8 @@ var slice = require('sliced')
 module.exports = afterQueue
 
 function afterQueue(fn, doAfter) {
+  after.__proto__ = fn
+  after.prototype = fn.prototype
   function after() {
     var result = fn.apply(this, arguments)
     doAfter.value = result
@@ -20,6 +22,8 @@ function afterQueue(fn, doAfter) {
 }
 
 afterQueue.return = function afterQueueValue(fn, doAfter) {
+  after.__proto__ = fn
+  after.prototype = fn.prototype
   function after() {
     var result = fn.apply(this, arguments)
     doAfter.value = result
@@ -33,3 +37,4 @@ afterQueue.return = function afterQueueValue(fn, doAfter) {
   }
   return after
 }
+

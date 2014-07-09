@@ -156,6 +156,29 @@ test('after.return overrides return value', function(t) {
   t.end()
 })
 
+test('function keys are propagated with copy on write', function(t) {
+  function stuff(arg) {
+    return stuff.amount + arg
+  }
+  stuff.amount = 10
+
+  var newStuff = after.return(stuff, function(result) {
+    return result + 1
+  })
+
+  t.equal(newStuff.prototype, stuff.prototype)
+  t.equal(newStuff.amount, 10)
+  stuff.amount = 12
+  t.equal(newStuff.amount, 12)
+  newStuff.amount = 100
+  t.equal(stuff.amount, 12)
+  t.equal(newStuff.amount, 100)
+  stuff.amount = 120
+  t.equal(stuff.amount, 120)
+  t.equal(newStuff.amount, 100)
+  t.end()
+})
+
 test('chain executes in order of definition', function(t) {
   t.plan(3)
   var called = []
