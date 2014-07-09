@@ -63,6 +63,7 @@ console.log('%s@v%s', myPackage.name, myPackage.version) // => my-package@v2
 * Original arguments will be passed as the second argument to the after function.
 * Original function will be passed as the third argument to the after function.
 * Original function `this` context is maintained.
+* Properties and prototype are inherited though function arity will not be preserved.
 
 ## See Also
 
