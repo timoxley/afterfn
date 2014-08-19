@@ -1,6 +1,6 @@
 {
   "name": "afterfn",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Invoke a function after a function.",
   "main": "index.js",
   "scripts": {
