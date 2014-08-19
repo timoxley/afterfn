@@ -200,3 +200,74 @@ test('chain executes in order of definition', function(t) {
 
   t.equal(fn(2,3), 5)
 })
+
+test('function keys are copied across', function(t) {
+  function Thing() {}
+  Thing.copied = true
+  var anotherThing = {}
+  Thing.prototype = anotherThing
+
+  var NewThing = after(Thing, function() {})
+  t.ok(NewThing.copied)
+  t.equal(NewThing.prototype, anotherThing)
+  t.end()
+})
+
+test('function keys are available on fn.fn', function(t) {
+  function Thing() {}
+  Thing.copied = true
+  var anotherThing = {}
+  Thing.prototype = anotherThing
+
+  after(Thing, function fn() {
+    t.ok(fn.fn.copied)
+    t.equal(fn.fn.prototype, anotherThing)
+    t.end()
+  })()
+})
+
+test('recursive calls work correctly', function(t) {
+  t.plan(8)
+  var count = 0
+  var addOne = after.return(function(arg) {
+    return arg
+  }, function fn(arg) {
+    ;(function(count) {
+      t.deepEqual(fn.args, [count - 1], 'fn.args == [ '+(count - 1)+' ] ')
+      fn.args = null
+      if (count < 4) {
+        var actual = addOne(count)
+        t.equal(actual, count + 1, 'addOne('+count+') '+actual+' == ' + (count + 1))
+      }
+    })(++count)
+    return arg+1
+  })
+  t.equal(addOne(count), 1)
+})
+
+test('no error if args set to weird value', function(t) {
+  var args = [1,2,3]
+  var target = function(a, b, c) {
+    t.equal(arguments.length, 3)
+    t.deepEqual([].slice.call(arguments), args)
+    return a + b + c
+  }
+
+  var a = after(target, function fn() {
+    t.deepEqual(fn.args, args)
+    fn.args = {}
+  })
+
+  var b = after(a, function fn() {
+    t.deepEqual(fn.args, args)
+    fn.args = null
+  })
+
+  var c = after(b, function fn() {
+    t.deepEqual(fn.args, args)
+    fn.args = false
+  })
+
+  t.equal(c.apply(null, args), 6)
+  t.end()
+})
